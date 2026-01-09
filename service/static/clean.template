@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="What Is My IP Address? - Professional IP Lookup Service">
+    <title>What Is My IP?</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --background-color: #f8fafc;
+            --text-color: #1e293b;
+            --card-background: #ffffff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #60a5fa;
+                --background-color: #0f172a;
+                --text-color: #f1f5f9;
+                --card-background: #1e293b;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .ip-address {
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 1rem 0;
+            word-break: break-all;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            text-align: left;
+            margin-top: 2rem;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: rgba(128, 128, 128, 0.05);
+            border-radius: 8px;
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+
+        a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
+        }
+
+        footer {
+            margin-top: auto;
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .api-links {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(128, 128, 128, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Your IP Address</h1>
+            <div class="ip-address">{{.Address}}</div>
+
+            <div class="info-grid">
+                {{if .Hostname}}
+                <div class="info-item">
+                    <div class="info-label">Hostname</div>
+                    <div class="info-value">{{.Hostname}}</div>
+                </div>
+                {{end}}
+
+                {{if .ISP}}
+                <div class="info-item">
+                    <div class="info-label">ISP</div>
+                    <div class="info-value">{{.ISP}}</div>
+                </div>
+                {{end}}
+
+                {{if .Country}}
+                <div class="info-item">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">{{.City}}{{if .City}}, {{end}}{{.Country}} ({{.CountryCode}})</div>
+                </div>
+                {{end}}
+            </div>
+
+            <div class="api-links">
+                <h3>API Access</h3>
+                <p>Get this data in: 
+                    <a href="/json">JSON</a> &bull; 
+                    <a href="/xml">XML</a> &bull; 
+                    <a href="/yaml">YAML</a> &bull; 
+                    <a href="/text">Plain Text</a>
+                </p>
+                <p>Browser Headers: <a href="/headers">View Headers</a></p>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>&copy; IP Service. Powered by Go.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+    "ip_address": "{{.Address}}",
+    "hostname": "{{.Hostname}}",
+    "isp": "{{.ISP}}",
+    "city": "{{.City}}",
+    "country": "{{.Country}}",
+    "country_code": "{{.CountryCode}}",
+    "location": "{{.Geo}}"
+}

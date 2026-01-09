@@ -1,0 +1,9 @@
+<ip-response>
+     <ip-address>{{.Address}}</ip-address>
+     <location>{{.Geo}}</location>
+     <hostname>{{.Hostname}}</hostname>
+     <isp>{{.ISP}}</isp>
+     <city>{{.City}}</city>
+     <country>{{.Country}}</country>
+     <country-code>{{.CountryCode}}</country-code>
+</ip-response>

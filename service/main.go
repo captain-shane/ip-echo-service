@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
-	"text/template"
+	"html/template"
 	"time"
 
 	"github.com/gorilla/mux"

@@ -128,8 +128,8 @@ func main() {
 
 	// Static files - with path traversal protection
 	r.PathPrefix("/static/").HandlerFunc(safeStaticHandler)
-	r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
-		serveStaticFile(w, r, "favicon.ico")
+	r.HandleFunc("/favicon.png", func(w http.ResponseWriter, r *http.Request) {
+		serveStaticFile(w, r, "favicon.png")
 	})
 	r.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		serveStaticFile(w, r, "robots.txt")
@@ -207,9 +207,9 @@ func getGeo(ipStr string) GeoLocation {
 	}
 
 	if orgReader != nil {
-		isp, err := orgReader.Enterprise(ip)
+		asn, err := orgReader.ASN(ip)
 		if err == nil {
-			loc.Org = isp.Traits.ISP
+			loc.Org = asn.AutonomousSystemOrganization
 		}
 	}
 

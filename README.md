@@ -101,6 +101,21 @@ location / {
 }
 ```
 
+**Google Cloud Run** (serverless):
+```bash
+# 1. Build and push image
+cd service
+gcloud builds submit --tag us-east1-docker.pkg.dev/YOUR_PROJECT/cloud-run-source-deploy/ip-echo-service
+
+# 2. Deploy with MaxMind credentials
+gcloud run deploy ip-echo-service \
+  --image us-east1-docker.pkg.dev/YOUR_PROJECT/cloud-run-source-deploy/ip-echo-service \
+  --region us-east1 \
+  --allow-unauthenticated \
+  --set-env-vars "MAXMIND_ACCOUNT_ID=YOUR_ACCOUNT_ID,MAXMIND_LICENSE_KEY=YOUR_LICENSE_KEY"
+```
+Cloud Run provides automatic HTTPS. GeoIP databases are downloaded at container startup using the provided credentials.
+
 ## 🛡️ Security
 
 - ✅ Rate limiting (10 req/10sec per IP)
@@ -155,6 +170,18 @@ sudo netstat -tulpn | grep :8090
 ```
 
 See [Troubleshooting](./DOCUMENTATION.md#troubleshooting) in full docs for more.
+
+## 📋 Changelog
+
+### v1.1.0 (2026-01-19)
+- **Fixed**: ISP/ASN lookup now works with GeoLite2-ASN database (was using wrong API method)
+- **Added**: Google Cloud Run deployment support with runtime GeoIP download
+- **Added**: New globe favicon
+- **Improved**: Vertical layout for hostname/ISP/location display
+- **Cleaned**: Removed unused dependencies (certmagic, redis, prometheus)
+
+### v1.0.0
+- Initial release
 
 ## 📝 License
 

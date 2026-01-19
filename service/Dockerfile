@@ -1,35 +1,43 @@
 # Build stage
-FROM golang:1.25-alpine AS builder
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /app
-COPY go.mod go.sum ./
-RUN go mod download
 
-COPY main.go ./
-RUN go mod tidy && CGO_ENABLED=0 GOOS=linux go build -o ip-service .
+# Copy all Go source files
+COPY go.mod main.go ./
+
+# Download dependencies (go mod tidy will create go.sum)
+RUN go mod tidy && go mod download
+
+# Build binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o ip-service .
 
 # Final stage
 FROM alpine:latest
 
 WORKDIR /app
-RUN apk --no-cache add ca-certificates wget && \
+RUN apk --no-cache add ca-certificates curl tar && \
     apk upgrade --no-cache
 
 # Create non-root user
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
-# Copy binary and static assets
+# Copy binary, startup script, and static assets
 COPY --from=builder /app/ip-service .
+COPY startup.sh ./
 COPY static ./static
-# Copy GeoIP if present
-COPY geoip ./geoip 
+
+# Create geoip directory (databases downloaded at runtime)
+RUN mkdir -p ./geoip
 
 # Set permissions
-RUN chown -R appuser:appgroup /app
+RUN chmod +x ./startup.sh && \
+    chown -R appuser:appgroup /app
 
 USER appuser
 
-EXPOSE 8080 8443
+# Cloud Run uses PORT env var (default 8080)
+EXPOSE 8080
 
-# Default command
-CMD ["./ip-service", "-addr", ":8080", "-static", "./static"]
+# Use startup script to download GeoIP DBs and start service
+CMD ["./startup.sh"]

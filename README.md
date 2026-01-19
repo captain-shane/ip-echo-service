@@ -2,131 +2,57 @@
 
 A professional, lightweight IP address lookup service with geolocation, built in Go.
 
-## 🚀 Quick Start
+![IP Echo Service Screenshot](docs/screenshot.png)
+
+## ⚠️ Prerequisites
+
+- **Docker** (for local deployment) or **Google Cloud SDK** (for Cloud Run)
+- **MaxMind Account** (free) - Required for GeoIP features (city, country, ISP lookup)
+  - Sign up: https://www.maxmind.com/en/geolite2/signup
+  - You'll need your **Account ID** and **License Key**
+
+> Without MaxMind credentials, the service still works but only returns IP and hostname.
+
+## 🚀 Quick Start (Docker)
 
 ```bash
-# 1. Get a free MaxMind license key (for GeoIP)
-# Visit: https://www.maxmind.com/en/geolite2/signup
-
-# 2. Run setup script
+# 1. Clone and run setup (will prompt for MaxMind license key)
 ./setup.sh
 
-# 3. Start the service
+# 2. Start the service
 docker compose up -d --build
 
-# 4. Test it
+# 3. Test it
 curl http://localhost:8090/json
 ```
 
-## 📚 Full Documentation
+## ☁️ Cloud Run Deployment
 
-**See [DOCUMENTATION.md](./DOCUMENTATION.md)** for complete information on:
-- All deployment scenarios (direct HTTP, HTTPS, reverse proxy, cloud)
-- Full API reference
-- Security features
-- Configuration options
-- Troubleshooting
+For serverless deployment with automatic HTTPS:
 
-## ✨ Features
-
-- **Multiple Formats**: JSON, XML, YAML, Plain Text, HTML
-- **GeoIP Lookup**: City, country, ISP (requires MaxMind databases)
-- **Rate Limited**: 10 requests/10 seconds per IP
-- **CORS Enabled**: Use from browser JavaScript
-- **Secure**: Non-root container, security headers, path traversal protection
-- **Production Ready**: Resource limits, health checks, structured logging
-
-## 🎯 Use Cases
-
-### As a Development Tool
-```bash
-curl https://ip.yourdomain.com
-```
-
-### From JavaScript
-```javascript
-fetch('https://ip.yourdomain.com/json')
-  .then(r => r.json())
-  .then(data => console.log(data.ip_address));
-```
-
-### With Reverse Proxy (Nginx)
-See [Deployment Scenarios](./DOCUMENTATION.md#deployment-scenarios) in full docs.
-
-## 📦 What's Included
-
-```
-ip_service/
-├── service/
-│   ├── main.go              # Application code
-│   ├── Dockerfile           # Container definition
-│   ├── static/              # HTML templates, assets
-│   └── geoip/               # Place GeoIP databases here
-├── docker-compose.yaml      # Development (port 8090)
-├── docker-compose.prod.yaml # Production (port 80)
-├── setup.sh                 # Setup script (downloads GeoIP)
-├── DOCUMENTATION.md         # Complete documentation ⭐
-├── SECURITY.md              # Security features & guide
-└── README.md                # This file
-```
-
-## 🔧 Configuration
-
-**Development** (localhost only):
-```bash
-docker compose up -d
-# Runs on http://127.0.0.1:8090
-```
-
-**Production** (public port 80):
-```bash
-docker compose -f docker-compose.prod.yaml up -d
-# Runs on http://0.0.0.0:80
-```
-
-**With TLS/HTTPS**:
-```bash
-docker run -d -p 443:8443 \
-  -v /path/to/certs:/certs:ro \
-  ip-service \
-  ./ip-service -tls -cert /certs/fullchain.pem -key /certs/privkey.pem -addr :8443
-```
-
-**Behind Nginx** (recommended for production):
-```nginx
-location / {
-    proxy_pass http://127.0.0.1:8090;
-    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-    # See DOCUMENTATION.md for complete config
-}
-```
-
-**Google Cloud Run** (serverless):
 ```bash
 # 1. Build and push image
 cd service
 gcloud builds submit --tag us-east1-docker.pkg.dev/YOUR_PROJECT/cloud-run-source-deploy/ip-echo-service
 
-# 2. Deploy with MaxMind credentials
+# 2. Deploy with MaxMind credentials as environment variables
 gcloud run deploy ip-echo-service \
   --image us-east1-docker.pkg.dev/YOUR_PROJECT/cloud-run-source-deploy/ip-echo-service \
   --region us-east1 \
   --allow-unauthenticated \
   --set-env-vars "MAXMIND_ACCOUNT_ID=YOUR_ACCOUNT_ID,MAXMIND_LICENSE_KEY=YOUR_LICENSE_KEY"
 ```
-Cloud Run provides automatic HTTPS. GeoIP databases are downloaded at container startup using the provided credentials.
 
-## 🛡️ Security
+GeoIP databases are automatically downloaded at container startup.
 
-- ✅ Rate limiting (10 req/10sec per IP)
-- ✅ CORS support for browser APIs
-- ✅ Security headers (CSP, X-Frame-Options, etc.)
-- ✅ Path traversal protection
-- ✅ Non-root container user
-- ✅ Resource limits (CPU/RAM)
-- ✅ DNS timeout (prevents DoS)
+## ✨ Features
 
-See [SECURITY.md](./SECURITY.md) for complete security documentation.
+- **Multiple Formats**: JSON, XML, YAML, Plain Text, HTML
+- **GeoIP Lookup**: City, country, ISP (requires MaxMind)
+- **Rate Limited**: 10 requests/10 seconds per IP
+- **CORS Enabled**: Use from browser JavaScript
+- **Secure**: Non-root container, security headers, path traversal protection
+- **Dark Mode**: Automatic based on system preference
 
 ## 🌍 API Endpoints
 
@@ -139,11 +65,11 @@ See [SECURITY.md](./SECURITY.md) for complete security documentation.
 | `/text` | Plain text IP only |
 | `/headers` | View HTTP headers |
 
-Example response:
+**Example JSON response:**
 ```json
 {
   "ip_address": "203.0.113.42",
-  "hostname": "example.com",
+  "hostname": "server.example.com",
   "isp": "Example ISP",
   "city": "San Francisco",
   "country": "United States",
@@ -151,34 +77,53 @@ Example response:
 }
 ```
 
-## 🐛 Troubleshooting
+## 🔧 Other Deployment Options
 
-**Service won't start?**
+**Production (port 80):**
 ```bash
-docker logs ip-service
+docker compose -f docker-compose.prod.yaml up -d
 ```
 
-**GeoIP not working?**
+**With TLS/HTTPS:**
 ```bash
-ls service/geoip/  # Should see ipcity.mmdb, iporg.mmdb
-./setup.sh         # Re-run setup
+docker run -d -p 443:8443 \
+  -v /path/to/certs:/certs:ro \
+  ip-service \
+  ./ip-service -tls -cert /certs/fullchain.pem -key /certs/privkey.pem -addr :8443
 ```
 
-**Port conflict?**
-```bash
-sudo netstat -tulpn | grep :8090
+**Behind Nginx:**
+```nginx
+location / {
+    proxy_pass http://127.0.0.1:8090;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+}
 ```
 
-See [Troubleshooting](./DOCUMENTATION.md#troubleshooting) in full docs for more.
+## 🛡️ Security
+
+- Rate limiting (10 req/10sec per IP)
+- CORS support for browser APIs
+- Security headers (CSP, X-Frame-Options, etc.)
+- Path traversal protection
+- Non-root container user
+- Resource limits (CPU/RAM)
+
+See [SECURITY.md](./SECURITY.md) for details.
+
+## 📚 Documentation
+
+- [DOCUMENTATION.md](./DOCUMENTATION.md) - Full API reference, deployment scenarios
+- [SECURITY.md](./SECURITY.md) - Security features guide
+- [QUICKREF.md](./QUICKREF.md) - Quick reference card
 
 ## 📋 Changelog
 
 ### v1.1.0 (2026-01-19)
-- **Fixed**: ISP/ASN lookup now works with GeoLite2-ASN database (was using wrong API method)
-- **Added**: Google Cloud Run deployment support with runtime GeoIP download
+- **Fixed**: ISP/ASN lookup now works with GeoLite2-ASN database
+- **Added**: Google Cloud Run deployment support
 - **Added**: New globe favicon
-- **Improved**: Vertical layout for hostname/ISP/location display
-- **Cleaned**: Removed unused dependencies (certmagic, redis, prometheus)
+- **Improved**: Vertical layout for info display
 
 ### v1.0.0
 - Initial release
@@ -190,7 +135,3 @@ MIT License - See [LICENSE](./LICENSE)
 ## Acknowledgments
 
 Built upon the original [wtfismyip](https://codeberg.org/wtfismyip/wtfismyip) project.
-
----
-
-**For complete documentation including all deployment scenarios, see [DOCUMENTATION.md](./DOCUMENTATION.md)**

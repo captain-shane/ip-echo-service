@@ -233,6 +233,25 @@ services:
 
 ### Scenario 4: Cloud Deployment (Azure/GCP/AWS)
 
+#### Google Cloud Run (Serverless):
+
+**Best for**: Auto-scaling, zero maintenance, automatic HTTPS.
+
+1. **Build and push image**:
+   ```bash
+   cd service
+   gcloud builds submit --tag us-east1-docker.pkg.dev/YOUR_PROJECT/cloud-run-source-deploy/ip-echo-service
+   ```
+
+2. **Deploy with MaxMind Credentials**:
+   ```bash
+   gcloud run deploy ip-echo-service \
+     --image us-east1-docker.pkg.dev/YOUR_PROJECT/cloud-run-source-deploy/ip-echo-service \
+     --region us-east1 \
+     --allow-unauthenticated \
+     --set-env-vars "MAXMIND_ACCOUNT_ID=YOUR_ID,MAXMIND_LICENSE_KEY=YOUR_KEY"
+   ```
+
 #### Azure VM:
 ```bash
 # 1. Create VM with public IP
@@ -526,5 +545,5 @@ MIT License - See `LICENSE` file
 
 ---
 
-**Version**: 2.0  
-**Last Updated**: 2026-01-09
+**Version**: 2.1  
+**Last Updated**: 2026-01-19

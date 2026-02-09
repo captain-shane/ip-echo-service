@@ -35,3 +35,7 @@ npm-debug.log*
 # Temporary files
 *.tmp
 .cache/
+
+# Security Mandates (v2026.02)
+*_secrets.yaml
+
